@@ -39,42 +39,35 @@ function mainTest({urlApi, frontImg, backImg, folderVideo, fileNameResult, callb
   })
 
   worksheet.getRow(1).font = {bold: true}
-
-  fs.readdir(`${folderVideo}/`,  async (err, files) => {
-    // create multi request
-    files.map( file => {
-      const options = {
-        method: "POST",
-        url: urlApi,
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        },
-        formData : {
-          "image_card1" : fs.createReadStream(frontImg),
-          "image_card2" : fs.createReadStream(backImg),
-          "video_general" : fs.createReadStream(`${folderVideo}/${file}`),
-        }
-      };
-
-      request(options, async function (err, res, body) {
-        const resultRequest =  callbackResponse(body)
-        worksheet.addRow({
-          api : urlApi,
-          request: JSON.stringify({
-            image_card1: frontImg,
-            image_card2: backImg,
-            video_general: `${folderVideo}/${file}`
-          }),
-          response: body,
-          result : resultRequest
-        })
-        await workbook.xlsx.writeFile(fileNameResult)
-        console.log(body)
-      });
-    })
-    await workbook.xlsx.writeFile(fileNameResult)
-  });
-
+  fs.readdirSync(`${folderVideo}/`).forEach(file => {
+    const options = {
+      method: "POST",
+      url: urlApi,
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      formData : {
+        "image_card1" : fs.createReadStream(frontImg),
+        "image_card2" : fs.createReadStream(backImg),
+        "video_general" : fs.createReadStream(`${folderVideo}/${file}`),
+      }
+    };
+    request(options, async function (err, res, body) {
+      const resultRequest =  callbackResponse(body)
+      worksheet.addRow({
+        api : urlApi,
+        request: JSON.stringify({
+          image_card1: frontImg,
+          image_card2: backImg,
+          video_general: `${folderVideo}/${file}`
+        }),
+        response: body,
+        result : resultRequest
+      })
+      await workbook.xlsx.writeFile(fileNameResult)
+      console.log(body)
+    });
+  })
 }
 
 mainTest({
