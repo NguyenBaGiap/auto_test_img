@@ -40,9 +40,9 @@ function mainTest({urlApi, frontImg, backImg, folderVideo, fileNameResult, callb
 
   worksheet.getRow(1).font = {bold: true}
 
-  fs.readdir(`${folderVideo}/`, (err, files) => {
+  fs.readdir(`${folderVideo}/`,  async (err, files) => {
     // create multi request
-    files.map(file => {
+    files.map( file => {
       const options = {
         method: "POST",
         url: urlApi,
@@ -57,7 +57,7 @@ function mainTest({urlApi, frontImg, backImg, folderVideo, fileNameResult, callb
       };
 
       request(options, async function (err, res, body) {
-        const resultRequest = callbackResponse(body)
+        const resultRequest =  callbackResponse(body)
         worksheet.addRow({
           api : urlApi,
           request: JSON.stringify({
@@ -69,18 +69,19 @@ function mainTest({urlApi, frontImg, backImg, folderVideo, fileNameResult, callb
           result : resultRequest
         })
         await workbook.xlsx.writeFile(fileNameResult)
+        console.log(body)
       });
-
     })
+    await workbook.xlsx.writeFile(fileNameResult)
   });
 
 }
 
 mainTest({
   urlApi: 'https://ekyc.digital-id.vn/call/register_ekyc_front_back_face_video',
-  frontImg: 'img_test/0564280349_CMT F.JPG',
-  backImg : 'img_test/0564280349_CMT B.JPG',
-  folderVideo : 'DATA_GM4',
-  fileNameResult: 'result_test_gm_4.xlsx',
+  frontImg: 'img/0834211851_CMT F.JPG',
+  backImg : 'img/0834211851_CMT B.JPG',
+  folderVideo : 'DATA_GM1',
+  fileNameResult: 'result_test_gm_1.xlsx',
   callbackResponse: checkLiveness
 })
