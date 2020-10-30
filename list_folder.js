@@ -81,22 +81,26 @@ function createResult({urlApi, pathFolderRoot, fileNameResult, callbackResponse}
         console.log(`folder: ${folder}`)
         let frontImg = `${pathFolderRoot}/${folder}/` + fs.readdirSync(`${pathFolderRoot}/${folder}/`).filter(f => f.endsWith('F.jpg'))[0]
         let backImg = `${pathFolderRoot}/${folder}/` + fs.readdirSync(`${pathFolderRoot}/${folder}/`).filter(f => f.endsWith('B.jpg'))[0]
-        let video = `${pathFolderRoot}/${folder}/` + fs.readdirSync(`${pathFolderRoot}/${folder}/`).filter(f => f.endsWith('.mp4'))[0]
-        console.log(`frontImg: ${frontImg}`)
-        console.log(`backImg: ${backImg}`)
-        console.log(`video: ${video}`)
+        let video =  fs.readdirSync(`${pathFolderRoot}/${folder}/`).filter(f => f.endsWith('.mp4'))
 
+        console.log(`folder ${folder} has ${video.length} video.`)
+        if(video.length > 0){
+            for (const v of video) {
+                let videoTest = `${pathFolderRoot}/${folder}/` + v
+                createResultPostAPI({
+                    urlApi: urlApi,
+                    folderPhone: folder,
+                    frontImg:frontImg,
+                    backImg:backImg,
+                    video:videoTest,
+                    fileNameResult: fileNameResult,
+                    callbackResponse:callbackResponse,
+                    workbook:workbook
+                })
+                await workbook.xlsx.writeFile(fileNameResult)
+            }
+        }
 
-        createResultPostAPI({
-            urlApi: urlApi,
-            folderPhone: folder,
-            frontImg:frontImg,
-            backImg:backImg,
-            video:video,
-            fileNameResult: fileNameResult,
-            callbackResponse:callbackResponse,
-            workbook:workbook
-        })
         await workbook.xlsx.writeFile(fileNameResult)
 
     })
@@ -104,6 +108,6 @@ function createResult({urlApi, pathFolderRoot, fileNameResult, callbackResponse}
 createResult({
     urlApi:'https://ekyc.digital-id.vn/call/register_ekyc_front_back_face_video',
     pathFolderRoot:'testmultidata',
-    fileNameResult:'test_multi_folder.xlsx',
+    fileNameResult:'test_list_folder.xlsx',
     callbackResponse: checkLiveness
 })
