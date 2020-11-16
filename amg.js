@@ -35,11 +35,15 @@ function createResult({urlApi1, urlApi2, folderImg, fileNameResult, callbackResp
 
     worksheet.columns = [
         {header: 'API_1', key: 'api1'},
-        {header: 'API_2', key: 'api2'},
         {header: 'Request_API_1', key: 'request1'},
         {header: 'Response_API_1', key: 'response1'},
+        {header: 'API_2', key: 'api2'},
         {header: 'Request_API_2', key: 'request2'},
         {header: 'Response_API_2', key: 'response2'},
+        // TODO
+        {header: 'Img Name', key: 'imgName'},
+        {header: 'Img Hash', key: 'imgHash'},
+        {header: 'Client_Session', key: 'clientSession'},
         {header: 'Result test case', key: 'result'}
     ]
 
@@ -68,6 +72,8 @@ function createResult({urlApi1, urlApi2, folderImg, fileNameResult, callbackResp
 
             request(options, async function (err, res, body) {
                 const img = JSON.parse(body)["object"]["hash"]
+                const clientSession = new Date().getTime()
+
                 console.log(img)
                 const optionRequest02 = {
                     method: "POST",
@@ -78,25 +84,30 @@ function createResult({urlApi1, urlApi2, folderImg, fileNameResult, callbackResp
                     },
                     body: JSON.stringify({
                         ...req,
-                        "img": img
+                        "img": img,
+                        "client_session":clientSession
                     })
                 };
                 request(optionRequest02, async function (err2, res2, body2) {
                     const resultRequest =  await callbackResponse(body2)
                     worksheet.addRow({
                         api1 : urlApi1,
-                        api2 : urlApi2,
                         request1: JSON.stringify({
                             "file" : `${folderImg}/${file}`,
                             "title" : "title ocr",
                             "description" : "description ocr",
                         }),
                         response1: body,
+                        api2 : urlApi2,
                         request2: JSON.stringify({
                             ...req,
-                            "img": img
+                            "img": img,
+                            "client_session":clientSession
                         }),
                         response2: body2,
+                        imgName:file,
+                        imgHash:img,
+                        clientSession:clientSession,
                         result : resultRequest
                     })
                     await workbook.xlsx.writeFile(fileNameResult)
