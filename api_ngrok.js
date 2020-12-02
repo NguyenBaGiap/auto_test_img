@@ -30,6 +30,7 @@ function createResultPostAPI({urlApi, folderPhone, frontImg, backImg, video, fil
     const options = {
         method: "POST",
         url: urlApi,
+        json: true,
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
         },
@@ -51,7 +52,7 @@ function createResultPostAPI({urlApi, folderPhone, frontImg, backImg, video, fil
                 image_card2: backImg,
                 video_general: video
             }),
-            response: body
+            response: JSON.stringify(body)
         })
         await workbook.xlsx.writeFile(fileNameResult)
         console.log(body)
@@ -109,6 +110,7 @@ function createResultPostImageAPI({urlApi, folderPhone, frontImg, backImg, img, 
     const options = {
         method: "POST",
         url: urlApi,
+        json: true,
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
         },
@@ -130,7 +132,7 @@ function createResultPostImageAPI({urlApi, folderPhone, frontImg, backImg, img, 
                 image_card2: backImg,
                 image_general: img
             }),
-            response: body
+            response: JSON.stringify(body)
         })
         await workbook.xlsx.writeFile(fileNameResult)
         console.log(body)
