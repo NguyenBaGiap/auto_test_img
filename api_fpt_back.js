@@ -4,19 +4,12 @@ const Excel = require('exceljs')
 
 function checkLiveness(body){
     try {
-        let bodyJson = JSON.parse(body)
-        const output = bodyJson.output
-
-
-        const matched = output[2]
-        const liveness = matched["is_matched"]["liveness"]
-
-        if(liveness === "True"){
-            return "Pass"
-        }
-        if(liveness === "False"){
-            return "Fail"
-        }
+        let bodyJson = body
+        let result
+        const data = bodyJson.data
+        const _check = data[1]
+        result = _check["post_check_result"].result
+        return result
     } catch (e) {
         return "N/A"
     }
@@ -42,6 +35,7 @@ function createResultPostImageAPI({urlApi, folderPhone, frontImg, backImg, img, 
     };
 
     request(options, async function (err, res, body) {
+        const result = await checkLiveness(body)
         worksheet.addRow({
             api : urlApi,
             folder : folderPhone,
@@ -49,7 +43,8 @@ function createResultPostImageAPI({urlApi, folderPhone, frontImg, backImg, img, 
                 image: backImg,
                 check: 1,
             }),
-            response: JSON.stringify(body)
+            response: JSON.stringify(body),
+            result:result
         })
         await workbook.xlsx.writeFile(fileNameResult)
         console.log(body)
@@ -66,6 +61,7 @@ function createResultApiImage({urlApi, pathFolderRoot, fileNameResult, callbackR
         {header: 'Folder', key: 'folder'},
         {header: 'Request', key: 'request'},
         {header: 'Response', key: 'response'},
+        {header: 'Post_check_result', key: 'result'},
     ]
 
     worksheet.columns.forEach(column => {
